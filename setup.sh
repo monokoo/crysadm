@@ -13,11 +13,16 @@ pip3.4 install redis && pip3.4 install requests && pip3.4 install flask
 #安装redis
 yum install -y redis 
 
+#使用随机生成的secret_key替换默认的key
+python3.4 gen_random_secret_key.py > secret
+secret_key=${cat screct|awk 'NR==2 {print}'}
+sed -i 's/SECRET_KEY = 'YTHnYgk0-M9Hu-wDmg-tvgT-4DPKQBjxYDA2'/SECRET_KEY = '${secret_key}'' ${BASE_DIR}/crysadm/config.py
+rm -f secret
 
 #运行云监工
 
 chmod +x ${BASE_DIR}/run.sh && chmod +x ${BASE_DIR}/down.sh && chmod +x ${BASE_DIR}/cron.sh 
-sh ${BASE_DIR}/run.sh && sh ${BASE_DIR}/cron.sh
+sh ${BASE_DIR}/run.sh #&& sh ${BASE_DIR}/cron.sh
 
 #python3.4 ${BASE_DIR}/crysadm/crysadm/crydadm_hlper.py &
 #python3.4 ${BASE_DIR}/crysadm/crysadm/crydadm.py &
