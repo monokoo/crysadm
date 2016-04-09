@@ -7,7 +7,7 @@ SECRETKEY = ''
 def write_key():
     SECRETKEY = random_key()
     print('本次SECRET_KEY为随机生成,生成内容绝不重复:')
-    print('%s' % ('SECRETKEY'))
+    print('%s' % (SECRETKEY))
 
 # 生成FLSAK SECRET_KEY
 def random_key():
