@@ -19,8 +19,8 @@ BIN2=/opt/crysadm/crysadm/crysadm.py
 
 
 start(){
-    python3.4 $BIN1 >> /tmp/error 2>&1 &
-    python3.4 $BIN2 >> /tmp/error 2>&1 &
+    /usr/local/bin/python3.4 $BIN1 >> /tmp/error 2>&1 &
+    /usr/local/bin/python3.4 $BIN2 >> /tmp/error 2>&1 &
     RETVAL=$?
     if [ "$RETVAL" = "0" ]; then
         echo "$name start success"
