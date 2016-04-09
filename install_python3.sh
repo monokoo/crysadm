@@ -1,5 +1,5 @@
+#!/bin/bash
 #更新源
-
 yum update 
 
 #安装python3.4,可以和python2共存
