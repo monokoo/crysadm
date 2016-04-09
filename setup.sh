@@ -20,9 +20,10 @@ sed -i "s/SECRET_KEY = 'YTHnYgk0-M9Hu-wDmg-tvgT-4DPKQBjxYDA2'/SECRET_KEY = '${se
 rm -f secret
 
 #运行云监工
-
-chmod +x ${BASE_DIR}/run.sh #&& chmod +x ${BASE_DIR}/down.sh && chmod +x ${BASE_DIR}/cron.sh 
-sh ${BASE_DIR}/run.sh #&& sh ${BASE_DIR}/cron.sh
+cp ${BASE_DIR}/crysadm/crysadm /etc/init.d/crysadm
+chmod +x /etc/init.d/crysadm
+chkconfig --add crysadm && chkconfig crysadm on
+service crysadm start
 
 #python3.4 ${BASE_DIR}/crysadm/crysadm/crydadm_hlper.py &
 #python3.4 ${BASE_DIR}/crysadm/crysadm/crydadm.py &
