@@ -22,5 +22,8 @@ make altinstall
 echo /usr/local/lib >> /etc/ld.so.conf.d/local.conf
 ldconfig
 
+#删除python安装包
+rm -rf Python-3.4*
+
 #重启后生效
 echo "Please reboot your server and then run the setup script--'./run.sh'"
