@@ -9,18 +9,17 @@
 用 `cd` 命令进入任意可写权限文件夹，输入命令<br>
 `git clone https://github.com/monokoo/crysadm.git`<br>
 等待下载完成，输入命令,配置python3.4环境<br>
-`cd crysadm  &&  chmod +x install_python3.sh && ./install_python3.sh`<br>
+`cd crysadm  &&  sh install_python3.sh`<br>
 配置完成之后重启服务器生效<br>
 `reboot`<br>
 进入系统执行setup.sh脚本<br>
-`cd crysadm  && chmod +x setup.sh && ./setup.sh`<br>
+`cd crysadm  && sh setup.sh`<br>
 此时等待安装，完成后会自动启动云监工。<br>
 ***
 ##PS:<br>
 ***
 install_python3.sh是配置python3.4脚本，，setup.sh是安装环境脚本。<br>
 如果同步最新代码更新执行以下命令:<br>
-chmod -x setup.sh <br>
 git pull <br>
 service crysadm restart <br>
 ***
