@@ -24,7 +24,9 @@ run.sh是运行脚本，down.sh是停止脚本，setup.sh是安装环境脚本�
 ***   
 - 默认端口：4000
 - 第一次获得密码方法：浏览器打开【IP:4000/install】
-##  2016.04.05 更新 v4.0901
+
+
+##  2016.04.09 更新 v4.0901
 感谢seatom 和 powergx的劳动成果，在此基础上适配centos系统
 修改脚本，仅适合centos系统，其他环境请参考https://github.com/seatom/crysadm
 
