@@ -34,11 +34,10 @@ service crysadm restart <br>
 
 
 ##  2016.04.09 更新 v4.0901
-感谢seatom 和 powergx的劳动成果，在此基础上适配centos系统
-修改脚本，仅适合centos系统，其他环境请参考https://github.com/seatom/crysadm
-启动service crysadm start
-关闭service crysadm stop
-重启service crysadm restart
+感谢seatom 和 powergx的劳动成果，在此基础上适配centos系统修改脚本，仅适合centos系统，其他环境请参考https://github.com/seatom/crysadm<br>
+启动service crysadm start <br>
+关闭service crysadm stop <br>
+重启service crysadm restart <br>
 
 ##  2016.04.05 更新 v4.0501 （本次改动文件:api.py,admin.py,crysadm_helper.py,user.py,profile.html,user_management.html）
 添加秘银复仇接口
