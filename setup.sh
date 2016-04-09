@@ -11,7 +11,9 @@ python3.4 ${BASE_DIR}/get-pip.py
 pip3.4 install redis && pip3.4 install requests && pip3.4 install flask
 
 #安装redis
-yum install -y redis 
+yum install -y redis
+systemctl enable redis
+service redis start
 
 #使用随机生成的secret_key替换默认的key
 python3.4 gen_random_secret_key.py > secret
