@@ -7,13 +7,7 @@ SECRETKEY = ''
 def write_key():
     SECRETKEY = random_key()
     print('本次SECRET_KEY为随机生成,生成内容绝不重复:')
-    print('')
-    print('SECRET_KEY=%s' % (SECRETKEY))
-    print('')
-    print('')
-    print('')
-    print('')
-    print('复制SECRET_KEY替换到config.py [SECRET_KEY],重启服务器即可')
+    print('%s' % ('SECRETKEY'))
 
 # 生成FLSAK SECRET_KEY
 def random_key():
@@ -38,5 +32,4 @@ def random_str(randomlength):
 
 if __name__ == '__main__':
     write_key()
-    while True:
-        time.sleep(1)
+
