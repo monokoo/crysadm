@@ -18,8 +18,8 @@
 ***
 ##PS:<br>
 ***
-install_python3.sh是配置python3.4脚本，run.sh是运行脚本，down.sh是停止脚本，setup.sh是安装环境脚本。
-如果同步最新代码更新执行以下命令
+install_python3.sh是配置python3.4脚本，run.sh是运行脚本，down.sh是停止脚本，setup.sh是安装环境脚本。<br>
+如果同步最新代码更新执行以下命令<br>
 chmod -x setup.sh <br>
 git pull <br>
 ***
