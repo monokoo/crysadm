@@ -14,8 +14,8 @@
 # Author: monokoo
 
 name=Crysadm
-BIN1=/opt/crysadm/crysadm_helper.py
-BIN2=/opt/crysadm/crysadm.py
+BIN1=/opt/crysadm/crysadm/crysadm_helper.py
+BIN2=/opt/crysadm/crysadm/crysadm.py
 
 
 start(){
