@@ -14,12 +14,13 @@
 # Author: monokoo
 
 name=Crysadm
-BINRUN=/opt/crysadm/run.sh
-BINDOWN=/opt/crysadm/down.sh
+BIN1=/opt/crysadm/crysadm_helper.py
+BIN2=/opt/crysadm/crysadm.py
 
 
 start(){
-    sh $BINRUN
+    python3.4 $BIN1 >> /tmp/error 2>&1 &
+    python3.4 $BIN2 >> /tmp/error 2>&1 &
     RETVAL=$?
     if [ "$RETVAL" = "0" ]; then
         echo "$name start success"
@@ -31,7 +32,7 @@ start(){
 stop(){
     pid=`ps -ef | grep -v grep | grep -v ps | grep -i "crysadm" | awk '{print $2}'`
     if [ ! -z $pid ]; then
-        sh $BINDOWN
+        pkill python3.4
         RETVAL=$?
         if [ "$RETVAL" = "0" ]; then
             echo "$name stop success"
@@ -51,8 +52,6 @@ status(){
         RETVAL=1
     else
         echo "$name is running with PID $pid"
-        cat /etc/shadowsocksrss/config.json | grep "protocol"
-        tail -n 10 /var/log/shadowsocks.log
         RETVAL=0
     fi
 }
