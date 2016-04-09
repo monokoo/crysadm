@@ -1,6 +1,6 @@
 #!/bin/bash
 echo 'Stop crysadm on'  $(date) >> /tmp/crysadm.txt
 
-service stop redis-server
+service redis stop
 pkill python3.4
 
