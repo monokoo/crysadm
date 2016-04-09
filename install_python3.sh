@@ -23,6 +23,7 @@ echo /usr/local/lib >> /etc/ld.so.conf.d/local.conf
 ldconfig
 
 #删除python安装包
+cd ..
 rm -rf Python-3.4*
 
 #重启后生效
