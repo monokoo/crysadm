@@ -21,7 +21,7 @@ rm -f secret
 
 #运行云监工
 
-chmod +x ${BASE_DIR}/run.sh && chmod +x ${BASE_DIR}/down.sh && chmod +x ${BASE_DIR}/cron.sh 
+chmod +x ${BASE_DIR}/run.sh #&& chmod +x ${BASE_DIR}/down.sh && chmod +x ${BASE_DIR}/cron.sh 
 sh ${BASE_DIR}/run.sh #&& sh ${BASE_DIR}/cron.sh
 
 #python3.4 ${BASE_DIR}/crysadm/crysadm/crydadm_hlper.py &
