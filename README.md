@@ -3,15 +3,13 @@
 
 ##用法
 进入系统后先升级源，输入命令<br>
-`sudo apt-get update` <br>
+`yum update` <br>
 等一会自动下载，输入命令 <br>
-`sudo apt-get install -y git` <br>
-如果出现`bash: sudo: command not found`错误，说明没有安装这个程序，直接输入命令<br>
-`apt-get install -y sudo git`<br>
+`yum install -y git` <br>
 用 `cd` 命令进入任意可写权限文件夹，输入命令<br>
-`sudo git clone https://github.com/seatom/crysadm.git`<br>
+`sudo git clone https://github.com/monokoo/crysadm.git`<br>
 等待下载完成，输入命令<br>
-`cd crysadm  && sudo chmod +x setup.sh && ./setup.sh`<br>
+`cd crysadm  &&  chmod +x setup.sh && ./setup.sh`<br>
 此时等待安装，完成后会自动启动云监工。<br>
 ***
 ##PS:<br>
@@ -26,8 +24,9 @@ run.sh是运行脚本，down.sh是停止脚本，setup.sh是安装环境脚本�
 ***   
 - 默认端口：4000
 - 第一次获得密码方法：浏览器打开【IP:4000/install】
-
-
+##  2016.04.05 更新 v4.0901
+感谢seatom 和 powergx的劳动成果，在此基础上适配centos系统
+修改脚本，仅适合centos系统，其他环境请参考https://github.com/seatom/crysadm
 
 ##  2016.04.05 更新 v4.0501 （本次改动文件:api.py,admin.py,crysadm_helper.py,user.py,profile.html,user_management.html）
 添加秘银复仇接口
