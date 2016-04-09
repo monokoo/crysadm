@@ -48,11 +48,15 @@ stop(){
 status(){
     pid=`ps -ef | grep -v grep | grep -v ps | grep -i "crysadm_helper" | awk '{print $2}'`
     if [ -z $pid ]; then
+        echo "*********************"
         echo "$name is not running"
+        echo "*********************"
         tail -f /tmp/error
         RETVAL=1
     else
+        echo "******************************"
         echo "$name is running with PID $pid"
+        echo "******************************"
         tail -f /tmp/error
         RETVAL=0
     fi
