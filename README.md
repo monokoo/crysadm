@@ -32,6 +32,14 @@ service crysadm restart <br>
 - 默认端口：4000
 - 第一次获得密码方法：浏览器打开【IP:4000/install】
 
+##  2016.04.10 更新 v4.1001 （本次改动文件:account.py,api.py,crysadm_helper.py,login.py,accounts.html）
+删除无用接口
+添加双重登陆接口
+更新部分接口参数
+添加迅雷账号全部启用函数
+添加迅雷账号全部停用函数
+添加迅雷账号全部启用按钮
+添加迅雷账号全部停用按钮
 
 ##  2016.04.09 更新 v4.0901
 感谢seatom 和 powergx的劳动成果，在此基础上适配centos系统修改脚本，仅适合centos系统，其他环境请参考https://github.com/seatom/crysadm<br>
