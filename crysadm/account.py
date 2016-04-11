@@ -129,7 +129,7 @@ def account_inactive_all():
 
     return redirect(url_for('accounts'))
 
-# 激活所有已经停止的迅雷会员帐号
+#  激活所有已经停止的迅雷会员帐号
 @app.route('/accounts/active_all', methods=['POST'])
 @requires_auth
 def account_activel_all():
