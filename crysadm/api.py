@@ -60,37 +60,55 @@ def exec_draw_cash(cookies, limits=None):
 
 # 获取提现信息
 def get_can_drawcash(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='1', appversion=appversion)
     return api_post(url='/?r=usr/drawcashInfo', data=body, cookies=cookies)
 
 # 检测提现余额
 def get_balance_info(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128: 
+        cookies['origin'] = '4' 
+    else: 
+        cookies['origin'] = '7'
     body = dict(v='2', appversion=appversion)
     return api_post(url='/?r=usr/asset', data=body, cookies=cookies)
 
 # 提交提现请求
 def draw_cash(cookies, money):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='3', m=str(money))
     return api_post(url='?r=usr/drawpkg', data=body, cookies=cookies)
 
 # 获取MINE信息
 def get_mine_info(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='4', appversion=appversion)
     return api_post(url='/?r=mine/info', data=body, cookies=cookies)
 
 # 获取收益信息
 def get_produce_stat(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(appversion=appversion)
     return api_post(url="/?r=mine/produce_stat", data=body, cookies=cookies)
 
 # 获取速度状态
 def get_speed_stat(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     try:
         proxies = api_proxies()
         r = requests.post(server_address + '/?r=mine/speed_stat', data=None, proxies=proxies, verify=False, cookies=cookies, headers=agent_header, timeout=60)
@@ -106,76 +124,115 @@ def get_speed_stat(cookies):
 
 # 获取个人信息
 def get_privilege(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='1', appversion=appversion, ver=appversion)
     return api_post(url='/?r=usr/privilege', data=body, cookies=cookies)
 
 # 获取设备状态
 def get_device_stat(s_type, cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(type=s_type, hand='0', v='2', ver='1')
     return api_post(url='/?r=mine/devices_stat', data=body, cookies=cookies)
 
 # 提交收集水晶请求
 def collect(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     return api_post(url='/index.php?r=mine/collect', data=None, cookies=cookies)
 
 # 获取宝箱信息
 def api_giftbox(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(tp='0', p='0', ps='60', t='', v='2', cmid='-1')
     return api_post(url='/?r=usr/giftbox', data=body, cookies=cookies)
 
 # 提交打开宝箱请求
 def api_openStone(cookies, giftbox_id, direction):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='1', id=str(giftbox_id), side=direction)
     return api_post(url='/?r=usr/openStone', data=body, cookies=cookies)
 
 # 提交放弃宝箱请求
 def api_giveUpGift(cookies, giftbox_id):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='2', id=str(giftbox_id), tag='0')
     return api_post(url='/?r=usr/giveUpGift', data=body, cookies=cookies)
 
 # 获取幸运转盘信息
 def api_getconfig(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     return api_post(url='/?r=turntable/getconfig', data=None, cookies=cookies)
 
 # 提交幸运转盘请求
 def api_getaward(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     return api_post(url='/?r=turntable/getaward', data=None, cookies=cookies)
 
 # 获取秘银进攻信息
 def api_sys_getEntry(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:         
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='6')
     return api_post(url='/?r=sys/getEntry', data=body, cookies=cookies)
 
 # 获取秘银复仇信息
 def api_steal_stolenSilverHistory(cookies):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='2', p='0', ps='20')
     return api_post(url='/?r=steal/stolenSilverHistory', data=body, cookies=cookies)
 
 # 提交秘银进攻请求
 def api_steal_search(cookies, searcht_id=0):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(v='2', sid=str(searcht_id))
     return api_post(url='/?r=steal/search', data=body, cookies=cookies)
 
 # 提交收集秘银请求
 def api_steal_collect(cookies, searcht_id):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(sid=str(searcht_id), cmid='-2', v='2')
     return api_post(url='/?r=steal/collect', data=body, cookies=cookies)
 
 # 提交进攻结果请求
 def api_steal_summary(cookies, searcht_id):
-    if len(cookies.get('sessionid')) == 128: cookies['origin'] = '4' else: cookies['origin'] = '7'
+    if len(cookies.get('sessionid')) == 128:          
+        cookies['origin'] = '4'      
+    else:          
+        cookies['origin'] = '7'
     body = dict(sid=str(searcht_id), v='2')
     return api_post(url='/?r=steal/summary', data=body, cookies=cookies)
 
