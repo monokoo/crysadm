@@ -29,7 +29,7 @@ def pow_mod(x, y, z):
 
 
 def old_login(username, md5_password):
-    from api import agent_header
+    #from api import agent_header
     exponent = int("010001", 16)
     modulus = int("D6F1CFBF4D9F70710527E1B1911635460B1FF9AB7C202294D04A6F135A906E90E2398123C234340A3CEA0E5EFDC"
                   "B4BCF7C613A5A52B96F59871D8AB9D240ABD4481CCFD758EC3F2FDD54A1D4D56BFFD5C4A95810A8CA25E87FDC75"
