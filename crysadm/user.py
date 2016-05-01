@@ -43,7 +43,7 @@ def user_login():
 
     session['user_info'] = user
 
-    guest(request, username)
+    guest_diary(request, username)
 
     return redirect(url_for('dashboard'))
 
@@ -63,10 +63,59 @@ def login():
 
 @app.route('/invitations')
 def public_invitation():
+    if session.get('user_info') is not None:
+        return redirect(url_for('dashboard'))
+
+    err_msg = None
+    if session.get('error_message') is not None:
+        err_msg = session.get('error_message')
+        session['error_message'] = None
+
+    inv_code = None
+    if session.get('invitation_code') is not None:
+        inv_code = session.get('invitation_code')
+        session['invitation_code'] = None
+
+    HTTP_X_REAL_IP = request.environ.get('HTTP_X_REAL_IP')
+
+    return render_template('public_invitation.html', err_msg=err_msg, inv_code=inv_code, ip=HTTP_X_REAL_IP)
+
+
+@app.route('/inv_codes', methods=['POST'])
+def public_inv_code():
+
+    public_key = 'invitation'
+    if r_session.get(public_key) is None:
+        r_session.set(public_key, json.dumps(dict(diary=[])))
+    public_info = json.loads(r_session.get(public_key).decode('utf-8'))
+
+    HTTP_X_REAL_IP = request.environ.get('HTTP_X_REAL_IP')
+    for public_code in public_info.get('diary'):
+        if HTTP_X_REAL_IP == public_code.get('ip'):
+            session['error_message'] = '您已经获取过邀请码了,请勿重复获取.'
+            session['invitation_code'] = public_code.get('inv_code')
+            return redirect(url_for('public_invitation'))
+
     inv_codes = r_session.smembers('public_invitation_codes')
+    if not inv_codes:
+        session['error_message'] = '暂时没有可用的邀请码,请稍后再试.'
+        return redirect(url_for('public_invitation'))
 
-    return render_template('public_invitation.html', inv_codes=inv_codes)
+    for code in inv_codes: continue
+    invitation_code = code.decode('utf-8')
 
+    public_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    body = dict(time=public_time, inv_code=invitation_code, ip=HTTP_X_REAL_IP)
+
+    public_body = public_info.get('diary')
+    public_body.append(body)
+
+    public_info['diary'] = public_body
+
+    r_session.set(public_key, json.dumps(public_info))
+
+    return render_template('register.html', invitation_code=invitation_code)
 
 
 @app.route('/user/logout')
@@ -77,22 +126,47 @@ def logout():
         del session['admin_user_info']
         return redirect(url_for('admin_user'))
 
+    user = session.get('user_info')
+    guest_diary(request, user.get('username'))
+
     session.clear()
     return redirect(url_for('login'))
-
-
-@app.route('/log')
+    
+type_dict = {'0':'','1':'收取','2':'宝箱','3':'转盘','4':'进攻','5':'复仇','6':'提现','7':'状态'}
+@app.route('/log/<sel_type>')
 @requires_auth
-def user_log():
+def user_log(sel_type):
     log_as = []
     user = session.get('user_info')
 
     record_key = '%s:%s' % ('record', user.get('username'))
     record_info = json.loads(r_session.get(record_key).decode('utf-8'))
 
+    user_key = '%s:%s' % ('user', user.get('username'))
+    user_info = json.loads(r_session.get(user_key).decode('utf-8'))
+
+    accounts_key = 'accounts:%s' % user.get('username')
+    id_map = {}
+    for acct in sorted(r_session.smembers(accounts_key)):
+        account_key = 'account:%s:%s' % (user.get('username'), acct.decode("utf-8"))
+        account_info = json.loads(r_session.get(account_key).decode("utf-8"))
+        if user_info.get('is_show_byname') != True:
+            id_map[account_info.get('user_id')]=account_info.get('username')
+        else:
+            id_map[account_info.get('user_id')]=account_info.get('account_name')
     for row in record_info.get('diary'):
-        if (datetime.now() - datetime.strptime(row.get('time'), '%Y-%m-%d %H:%M:%S')).days < 7:
-            log_as.append(row)
+        row['id']=id_map.get(row['id'])
+        if '1day' == request.args.get('time'):
+            if (datetime.now() - datetime.strptime(row.get('time'), '%Y-%m-%d %H:%M:%S')).days < 1:
+                if row.get('type').find(str(type_dict.get(sel_type)))!=-1:
+                    log_as.append(row)
+        elif 'all' == request.args.get('time'):
+            if row.get('type').find(str(type_dict.get(sel_type)))!=-1: log_as.append(row)
+        else:
+            if (datetime.now() - datetime.strptime(row.get('time'), '%Y-%m-%d %H:%M:%S')).days < 7:
+                if row.get('type').find(str(type_dict.get(sel_type)))!=-1: log_as.append(row)
+
+
     log_as.reverse()
 
     return render_template('log.html', log_user=log_as)
@@ -110,17 +184,10 @@ def user_log_delete():
 
     r_session.set(record_key, json.dumps(record_info))
 
-    return redirect(url_for('user_log'))
+    return redirect('/log/0')
 
 
-@app.route('/talk')
-@requires_auth
-def user_talk():
-
-    return render_template('talk.html')
-
-
-def guest(request, username):
+def guest_diary(request, username):
 
     guest_key = 'guest'
     if r_session.get(guest_key) is None:
@@ -146,8 +213,8 @@ def guest(request, username):
     guest_info['diary'] = guest_body
 
     r_session.set(guest_key, json.dumps(guest_info))
-    
-    
+
+
 @app.route('/user/profile')
 @requires_auth
 def user_profile():
@@ -212,8 +279,19 @@ def user_change_property(field, value):
         user_info['auto_revenge'] = True if value == '1' else False
     if field == 'auto_getaward':
         user_info['auto_getaward'] = True if value == '1' else False
-
+    if field == 'is_show_speed_data':
+        user_info['is_show_speed_data'] = True if value == '1' else False
+    if field == 'is_show_wpdc':
+        user_info['is_show_wpdc'] = True if value == '1' else False
+    if field == 'is_show_byname':
+        user_info['is_show_byname'] = True if value == '1' else False
+    if field == 'draw_money_modify':
+        try:
+            user_info['draw_money_modify'] = float(str(request.values.get('draw_money_modify')))
+        except ValueError:
+            return redirect(url_for('user_profile'))
     r_session.set(user_key, json.dumps(user_info))
+
 
     return redirect(url_for('user_profile'))
 
