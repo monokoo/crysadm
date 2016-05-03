@@ -9,7 +9,7 @@ chmod +x ${BASE_DIR}/get-pip.py
 python3.4 ${BASE_DIR}/get-pip.py
 
 pip3.4 install redis && pip3.4 install requests && pip3.4 install flask
-
+pip3.4 install flask-mail
 #安装redis
 yum install -y redis
 systemctl enable redis
