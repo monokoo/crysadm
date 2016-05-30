@@ -159,10 +159,10 @@ def save_history(username):
                 if 'cn' in ioi.keys() and 'ct' in ioi.keys() and time.localtime(ioi['ct']).tm_mday == datetime.now().day:
                     if ioi['cn'].find('宝箱') != -1 or ioi['cn'].find('转盘') != -1:
                         today_data['award_income'] += ioi['c']
-        today_data['pdc'] += today_data['award_income'] 
         for device in data.get('device_info'):
             today_data['last_speed'] += int(int(device.get('dcdn_upload_speed')) / 1024)
             today_data['deploy_speed'] += int(device.get('dcdn_download_speed') / 1024)
+    today_data['pdc'] += today_data['award_income'] 
     r_session.setex(key, json.dumps(today_data), 3600 * 24 * 35)
 
     extra_info_key='extra_info:%s' % (username)
@@ -183,9 +183,15 @@ def save_history(username):
             td_produce={}
             for td_stat in today_data['produce_stat']:
                 td_produce[td_stat['mid']]=td_stat['hourly_list']
+            detail_adjust_dict={}
             for stat in yesterday_data['produce_stat']:
                 if stat['mid'] in td_produce.keys():
-                    stat['hourly_list'][24]=td_produce[stat['mid']][23-datetime.strptime(today_data['updated_time'],'%Y-%m-%d %H:%M:%S').hour]
+                    last_hour_pdc=td_produce[stat['mid']][23-datetime.strptime(today_data['updated_time'],'%Y-%m-%d %H:%M:%S').hour]
+                    detail_adjust_dict[stat['mid']] = last_hour_pdc - stat['hourly_list'][24]
+                    stat['hourly_list'][24] = last_hour_pdc
+            for pdc_info in yesterday_data.get('pdc_detail'):
+                if pdc_info.get('mid') is not None and pdc_info.get('pdc') is not None:
+                    pdc_info['pdc'] += detail_adjust_dict[pdc_info.get('mid')]
         r_session.setex(yesterday_key, json.dumps(yesterday_data), 3600 * 24 * 34)
         extra_info['last_adjust_date']=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         r_session.set(extra_info_key,json.dumps(extra_info))
@@ -351,9 +357,9 @@ def check_report(user, cookies, user_info):
     if b_yesterday_data is None: return
     yesterday_data = json.loads(b_yesterday_data.decode('utf-8'))
     if 'produce_stat' in yesterday_data.keys():
-        if validateEmail(user_info['mail_address']) != 1: return
+        if validateEmail(user_info['email']) != 1: return
         mail = dict()
-        mail['to'] = user_info['mail_address']
+        mail['to'] = user_info['email']
         mail['subject'] = '云监工-收益报告'
         mail['text'] = """
 <DIV style="BACKGROUND-COLOR: #e6eae9">
@@ -430,11 +436,18 @@ def check_report(user, cookies, user_info):
                 </TD>
             </TR>
         </TBODY>
+        <TFOOT style="FONT-SIZE: 11px; BACKGROUND: none transparent scroll repeat 0% 0%">
+            <TR>
+                <TD colSpan=4 align=right>
+                """ + datetime.now().strftime('%Y-%m-%d %H:%M:%S') + """
+                </TD>
+            </TR>
+        </TFOOT>
     </TABLE>
 </DIV>
     """
-        send_email(mail,config_info)
-        extra_info['last_report_date']=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        if send_email(mail,config_info) == True:
+            extra_info['last_report_date']=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         r_session.set(extra_info_key,json.dumps(extra_info))
             
 
@@ -462,6 +475,7 @@ def detect_exception(user, cookies, user_info):
         detect_info=extra_info['detect_info']
     if not 'device_info' in account_data.keys(): return
     status_cn={'offline':'离线','online':'在线','exception':'异常'}
+    warn_list=[]
     for dev in account_data['device_info']:
         if 'status_list' not in detect_info.keys():
             detect_info['status_list']={}
@@ -469,16 +483,11 @@ def detect_exception(user, cookies, user_info):
             detect_info['status_list'][dev['device_name']]=dev['status']
         elif dev['status'] != detect_info['status_list'][dev['device_name']]:
             red_log(user, '矿机状态', '状态', '%s:%s -> %s' % (dev['device_name'],status_cn[detect_info['status_list'][dev['device_name']]],status_cn[dev['status']]))
+            detect_info['status_list'][dev['device_name']]=dev['status']
+            if 'exception_occured' not in detect_info.keys():
+                detect_info['exception_occured'] = True
         if dev['status'] != 'online':
-            if 'updated_time' in detect_info.keys() and account_data['updated_time'] != detect_info['updated_time']:
-                if 'last_warn' not in detect_info.keys() or (datetime.now() - datetime.strptime(detect_info['last_warn'],'%Y-%m-%d %H:%M:%S')).seconds > 60*60:
-                    if validateEmail(user_info['mail_address']) == 1:
-                        mail = dict()
-                        mail['to'] = user_info['mail_address']
-                        mail['subject'] = '云监工-矿机异常'
-                        mail['text'] = ''.join(['您的矿机：',dev['device_name'],'<br />状态：',status_cn[dev['status']] ,'<br />时间：',datetime.now().strftime('%Y-%m-%d %H:%M:%S')])
-                        send_email(mail,config_info)
-                        detect_info['last_warn']=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            warn_list.append(dev);
         if 'dcdn_clients' in dev.keys():
             for i,client in enumerate(dev['dcdn_clients']):
                 space_last_key='space_%s:%s:%s' % (i,user.get('userid'),dev['device_name'])
@@ -491,6 +500,23 @@ def detect_exception(user, cookies, user_info):
                         detect_info[space_last_key] = int(client['space_used'])
                 else:
                    detect_info[space_last_key] = int(client['space_used'])
+    if len(warn_list) != 0:
+        if 'updated_time' in detect_info.keys() and account_data['updated_time'] != detect_info['updated_time']:
+            if 'exception_occured' in detect_info.keys() and detect_info['exception_occured'] == True:
+                if 'last_warn' not in detect_info.keys() or (datetime.now() - datetime.strptime(detect_info['last_warn'],'%Y-%m-%d %H:%M:%S')).seconds > 60*60:
+                    if validateEmail(user_info['email']) == 1:
+                        mail = dict()
+                        mail['to'] = user_info['email']
+                        mail['subject'] = '云监工-矿机异常'
+                        mail['text'] = ''
+                        for dev in warn_list:
+                            mail['text'] = mail['text'].join(['您的矿机：',dev['device_name'],'<br />状态：',status_cn[dev['status']] ,'<br />时间：',datetime.now().strftime('%Y-%m-%d %H:%M:%S'),'<br />==================<br />'])
+                        if send_email(mail,config_info) == True:
+                            detect_info['last_warn']=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                            detect_info['exception_occured'] = False
+    else:
+        detect_info.pop('exception_occured','^.^')
+
     detect_info['updated_time'] = account_data['updated_time']
     extra_info['detect_info']=detect_info
     r_session.set(extra_info_key, json.dumps(extra_info))
@@ -744,7 +770,7 @@ if __name__ == '__main__':
             'select_auto_task_user_interval':10*60,
             'auto_detect_interval':5*60,
             'master_mail_smtp':'smtp.163.com',
-            'master_mail_address':'xxxxxxxx@163.com',
+            'master_email':'xxxxxxxx@163.com',
             'master_mail_password':'xxxxxxxxxxxxxx',
         }
         r_session.set(config_key, json.dumps(config_info))

@@ -32,10 +32,12 @@ def __get_yesterday_pdc(username):
         history_data = json.loads(b_data.decode('utf-8'))
         if begin_date >= month_start_date and begin_date < today.date():
             yesterday_m_pdc += history_data.get('pdc')
-            yesterday_m_award_income += history_data.get('award_income')
+            if 'award_income' in history_data.keys():
+                yesterday_m_award_income += history_data.get('award_income')
         if begin_date >= week_start_date and begin_date < today.date():
             yesterday_w_pdc += history_data.get('pdc')
-            yesterday_w_award_income += history_data.get('award_income')
+            if 'award_income' in history_data.keys():
+                yesterday_w_award_income += history_data.get('award_income')
 
     return yesterday_m_pdc, yesterday_w_pdc, yesterday_m_award_income, yesterday_w_award_income
 
@@ -335,23 +337,24 @@ def DoD_income_xunlei():
     else:
         yesterday_data = json.loads(b_yesterday_data_new.decode('utf-8'))
         yesterday_series['data'] = []
-        # 产量柱子开始
-        for i in range(1, 25): 
-            if yesterday_data.get('produce_stat')[0].get('hourly_list') is None:
-                break
-            temp = 0
-            for hourly_produce in yesterday_data.get('produce_stat'):
-                temp += hourly_produce.get('hourly_list')[i]
-            yesterday_series['data'].append(temp)
-        # 产量柱子结束
-            yesterday_speed_data = yesterday_data.get('speed_stat')
-        # 速度曲线开始
-        for i in range(0, 24):
-            if yesterday_speed_data is not None:
-                yesterday_speed_series['data'].append(sum(row.get('dev_speed')[i] for row in yesterday_speed_data))
-            else:
-                yesterday_speed_series['data'] = []
-        # 速度曲线结束
+        if 'produce_stat' in yesterday_data.keys() and len(yesterday_data['produce_stat'])!=0:
+            # 产量柱子开始
+            for i in range(1, 25): 
+                if yesterday_data.get('produce_stat')[0].get('hourly_list') is None:
+                    break
+                temp = 0
+                for hourly_produce in yesterday_data.get('produce_stat'):
+                    temp += hourly_produce.get('hourly_list')[i]
+                yesterday_series['data'].append(temp)
+            # 产量柱子结束
+                yesterday_speed_data = yesterday_data.get('speed_stat')
+            # 速度曲线开始
+            for i in range(0, 24):
+                if yesterday_speed_data is not None:
+                    yesterday_speed_series['data'].append(sum(row.get('dev_speed')[i] for row in yesterday_speed_data))
+                else:
+                    yesterday_speed_series['data'] = []
+            # 速度曲线结束
 
     now_income_value = sum(today_series['data'][0:now.hour])
     dod_income_value = sum(yesterday_series['data'][0:now.hour])
@@ -471,3 +474,28 @@ def header_info():
         data['api_error_info'] = b_api_error_info.decode('utf-8')
 
     return data
+
+@app.context_processor
+def accounts_count():
+    count_key = 'count:accounts';
+    b_count_info = r_session.get(count_key)
+    if b_count_info is not None:
+        return dict(accounts_count=json.loads(r_session.get(count_key).decode('utf-8')))
+    users = r_session.scard('users')
+    accounts = 0
+    accountsk = 0
+    for name in r_session.smembers('users'):
+        accounts_key = 'accounts:%s' % name.decode('utf-8')
+        for acct in r_session.smembers(accounts_key):
+            account_key = 'account:%s:%s' % (name.decode('utf-8'), acct.decode("utf-8"))
+            account_data_key = account_key + ':data'
+            account_data_value = r_session.get(account_data_key)
+            if account_data_value is None: continue
+            account_info = json.loads(account_data_value.decode("utf-8"))
+            for i in account_info.get('device_info'):
+                accountsk += 1
+
+        accounts += r_session.scard(accounts_key)
+    accounts_count = dict(users=users, accounts=accounts, accountsk=accountsk)
+    r_session.setex(count_key, json.dumps(accounts_count), 120)
+    return dict(accounts_count=accounts_count)
