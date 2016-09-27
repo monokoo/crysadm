@@ -30,8 +30,8 @@ start(){
 }
 
 stop(){
-    pid=`ps -ef | grep -v grep | grep -v ps | grep -i "crysadm_helper" | awk '{print $2}'`
-    if [ ! -z $pid ]; then
+    pid=`ps -ef | grep -v grep | grep -v ps | grep -i "crysadm_helper" | awk '{print $2}'|wc -l`
+    if [ $pid != 0 ]; then
         pkill python3.4
         RETVAL=$?
         if [ "$RETVAL" = "0" ]; then
@@ -46,8 +46,8 @@ stop(){
 }
 
 status(){
-    pid=`ps -ef | grep -v grep | grep -v ps | grep -i "crysadm_helper" | awk '{print $2}'`
-    if [ -z $pid ]; then
+    pid=`ps -ef | grep -v grep | grep -v ps | grep -i "crysadm_helper" | awk '{print $2}'|wc -l`
+    if [ $pid = 0 ]; then
         echo "*********************"
         echo "$name is not running"
         echo "*********************"
@@ -55,7 +55,7 @@ status(){
         RETVAL=1
     else
         echo "******************************"
-        echo "$name is running with PID $pid"
+        echo "$name is running with $pid processes"
         echo "******************************"
         tail -f /tmp/error
         RETVAL=0
